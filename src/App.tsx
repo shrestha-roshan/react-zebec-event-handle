@@ -1,25 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import { AccountInfo, Connection, PublicKey } from '@solana/web3.js';
+import { Idl, Program } from '@project-serum/anchor';
+import idl from './idl/zebec.json';
+import { WalletContext } from './components/wallet/Context';
+import { WalletButton } from './components/wallet/Button';
+import Stream from './components/streams/Stream';
 
+const getProviders = () => {
+  // @ts-ignore
+  if (window.solana.isPhantom) {
+    // @ts-ignore
+    return window.solana;
+  }
+}
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <WalletContext>
+      <div className="App">
+        <WalletButton />
+        <Stream/>
+      </div>
+    </WalletContext>
   );
 }
 
