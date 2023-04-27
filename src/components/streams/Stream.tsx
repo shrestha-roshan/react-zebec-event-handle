@@ -47,22 +47,22 @@ interface RawStream {
 	canCancel: boolean;
 	canUpdate: boolean;
 }
-const parseStream = (stream: any) => {
+const parseStream = (stream: any, id:string) => {
 	return {
-		id: stream.publicKey.toBase58(),
-		startTime: stream.account.startTime.toString(),
-		endTime: stream.account.endTime.toString(),
-		paused: stream.account.paused.toString(),
-		withdrawLimit: stream.account.withdrawLimit.toString(),
-		amount: stream.account.amount.toString(),
-		sender: stream.account.sender.toBase58(),
-		receiver: stream.account.receiver.toBase58(),
-		withdrawn: stream.account.withdrawn.toString(),
-		pausedAt: stream.account.pausedAt.toString(),
-		feeOwner: stream.account.feeOwner.toBase58(),
-		pausedAmt: stream.account.pausedAmt.toString(),
-		canCancel: stream.account.canCancel,
-		canUpdate: stream.account.canUpdate,
+		id: id,
+		startTime: stream.startTime.toString(),
+		endTime: stream.endTime.toString(),
+		paused: stream.paused.toString(),
+		withdrawLimit: stream.withdrawLimit.toString(),
+		amount: stream.amount.toString(),
+		sender: stream.sender.toBase58(),
+		receiver: stream.receiver.toBase58(),
+		withdrawn: stream.withdrawn.toString(),
+		pausedAt: stream.pausedAt.toString(),
+		feeOwner: stream.feeOwner.toBase58(),
+		pausedAmt: stream.pausedAmt.toString(),
+		canCancel: stream.canCancel,
+		canUpdate: stream.canUpdate,
 	};
 }
 
@@ -153,12 +153,12 @@ function Stream() {
     if (outgoing.length) {
       outgoing.forEach((item, i) => {
         connection.onAccountChange(new PublicKey(item.id), (info) => {
-          const data = program.coder.accounts.decode("stream", info.data)
+          const data = program.coder.accounts.decode("Stream", info.data)
           console.log(data);
           const newarr = [...outgoing];
-
-		  // may break
-          newarr[i] = parseStream(data);
+          console.log("newarr: ", newarr);
+		      // may break
+          newarr[i] = parseStream(data, item.id);
 
           setOutgoing(newarr);
         }, "finalized")
@@ -168,21 +168,22 @@ function Stream() {
   }, [outgoing])
 
   useEffect(() => {
-    if (outgoing.length) {
-      outgoing.forEach((item, i) => {
+    if (incoming.length) {
+      incoming.forEach((item, i) => {
         connection.onAccountChange(new PublicKey(item.id), (info) => {
-          const data = program.coder.accounts.decode("stream", info.data)
+          const data = program.coder.accounts.decode("Stream", info.data)
           console.log(data);
-          const newarr = [...outgoing];
+          const newarr = [...incoming];
 
 		  // may break here
-          newarr[i] =  parseStream(data);
-          setOutgoing(newarr);
+          newarr[i] =  parseStream(data, item.id);
+          setIncoming(newarr);
         }, "finalized")
       })
     }
     // eslint-disable-next-line
   }, [outgoing])
+
 	return (
 		<div>
 			<h1 className="font-bold text-3xl border-b-[3px] py-3">Outgoing</h1>
