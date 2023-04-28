@@ -165,25 +165,24 @@ function Stream() {
 						console.log(data);
 						const newarr = [...outgoing];
 						console.log("newarr: ", newarr);
-						// may break
 						newarr[i] = parseStream(data, item.id);
 
 						setOutgoing(newarr);
 					},
 					"finalized",
 				);
-				const newSubscriptions = [...outgoingSubs];
-				newSubscriptions[i] = id;
-				setOutgoingSub(newSubscriptions);
+				// const newSubscriptions = [...outgoingSubs];
+				// newSubscriptions[i] = id;
+				// setOutgoingSub(newSubscriptions);
 			});
 		}
-		return () => {
-			if (outgoingSubs.length) {
-				outgoingSubs.forEach((id) => {
-					connection.removeAccountChangeListener(id);
-				});
-			}
-		};
+		// return () => {
+		// 	if (outgoingSubs.length) {
+		// 		outgoingSubs.forEach((id) => {
+		// 			connection.removeAccountChangeListener(id);
+		// 		});
+		// 	}
+		// };
 	}, [outgoing, setOutgoing, setOutgoingSub, connection, outgoingSubs, program]);
 
 	useEffect(() => {
@@ -203,65 +202,144 @@ function Stream() {
 					"finalized",
 				);
 
-				const newSubscriptions = [...incommingSub];
-				newSubscriptions[i] = id;
-				setIncommingSub(newSubscriptions);
+				// const newSubscriptions = [...incommingSub];
+				// newSubscriptions[i] = id;
+				// setIncommingSub(newSubscriptions);
 			});
 		}
 
-		return () => {
-			if (incommingSub.length) {
-				incommingSub.forEach((id) => {
-					connection.removeAccountChangeListener(id);
-				});
-			}
-		};
+		// return () => {
+		// 	if (incommingSub.length) {
+		// 		incommingSub.forEach((id) => {
+		// 			connection.removeAccountChangeListener(id);
+		// 		});
+		// 	}
+		// };
 	}, [incoming, setIncoming, setIncommingSub, connection, incommingSub, program]);
 
 	return (
-		<div>
-			<h1 className="font-bold text-3xl border-b-[3px] py-3">Outgoing</h1>
-			<div className="rowC border-b-[3px] py-3">
-				{outgoing.map((stream) => (
-					<div key={stream.id} style={{ textAlign: "left", paddingLeft: "100px", paddingBottom: "70px" }}>
-						<strong>id: {stream.id}</strong>
-						<p>startTime: {stream.startTime}</p>
-						<p>endTime: {stream.endTime}</p>
-						<p>paused: {stream.paused}</p>
-						<p>withdrawLimit: {stream.withdrawLimit}</p>
-						<p>amount: {stream.amount}</p>
-						<p>sender: {stream.sender}</p>
-						<p>receiver: {stream.receiver}</p>
-						<p>withdrawn: {stream.withdrawn}</p>
-						<p>pausedAt: {stream.pausedAt}</p>
-						<p>feeOwner: {stream.feeOwner}</p>
-						<p>pausedAmt: {stream.pausedAmt}</p>
+		<div className="bg-slate-50">
+		  <h1 className="font-bold text-3xl border-b-[3px] py-3 bg-slate-300">Outgoing</h1>
+		  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			{outgoing.map((stream) => (
+			<div className="hover:-translate-y-1 hover:scale-105 mt-2">
+				<div
+					key={stream.id}
+					className="rounded-lg shadow-md p-6 overflow-hidden bg-slate-100"
+				>
+					<div className="flex items-center justify-between mb-4">
+					<h2 className="text-lg font-bold">{stream.id}</h2>
 					</div>
-				))}
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Sender:</span> {stream.sender}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Receiver:</span> {stream.receiver}
+					</p>
+					
+					<p className="text-sm mb-2">
+					<span className="font-bold">Amount:</span> {stream.amount}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Withdraw Limit:</span> {stream.withdrawLimit}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Start Time:</span> {stream.startTime}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">End Time:</span> {stream.endTime}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Withdrawn:</span> {stream.withdrawn}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Paused At:</span> {stream.pausedAt}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Fee Owner:</span> {stream.feeOwner}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Paused Amount:</span> {stream.pausedAmt}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Paused:</span> {stream.paused === '1' ? 'Yes' : 'No'}
+					</p>
+				</div>
 			</div>
-			<h1 className="font-bold text-3xl border-b-[3px] py-3">Incoming</h1>
-			<div className="rowC border-b-[3px] py-3">
-				{incoming.map((stream) => (
-					<div key={stream.id} style={{ textAlign: "left", paddingLeft: "100px", paddingBottom: "70px" }}>
-						<strong>id: {stream.id}</strong>
-						<p>startTime: {stream.startTime}</p>
-						<p>endTime: {stream.endTime}</p>
-						<p>paused: {stream.paused}</p>
-						<p>withdrawLimit: {stream.withdrawLimit}</p>
-						<p>amount: {stream.amount}</p>
-						<p>sender: {stream.sender}</p>
-						<p>receiver: {stream.receiver}</p>
-						<p>withdrawn: {stream.withdrawn}</p>
-						<p>pausedAt: {stream.pausedAt}</p>
-						<p>feeOwner: {stream.feeOwner}</p>
-						<p>pausedAmt: {stream.pausedAmt}</p>
-						<p>canCancel: {stream.canCancel}</p>
-						<p>canUpdate: {stream.canUpdate}</p>
+			))}
+		  </div>
+		  <br/>
+		  <h1 className="font-bold text-3xl border-b-[3px] py-3 border-t-2 bg-slate-300">Incoming</h1>
+		  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-2">
+			{incoming.map((stream) => (
+			<div className="hover:-translate-y-1 hover:scale-105">
+				<div
+					key={stream.id}
+					className="rounded-lg shadow-md p-6 overflow-hidden bg-slate-100"
+				>
+					<div className="flex items-center justify-between mb-4">
+					<h2 className="text-lg font-bold">{stream.id}</h2>
 					</div>
-				))}
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Sender:</span> {stream.sender}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Receiver:</span> {stream.receiver}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Amount:</span> {stream.amount}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Withdraw Limit:</span> {stream.withdrawLimit}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Start Time:</span> {stream.startTime}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">End Time:</span> {stream.endTime}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Withdrawn:</span> {stream.withdrawn}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Paused At:</span> {stream.pausedAt}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Fee Owner:</span> {stream.feeOwner}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Paused Amount:</span> {stream.pausedAmt}
+					</p>
+
+					<p className="text-sm mb-2">
+					<span className="font-bold">Paused:</span> {stream.paused === '1' ? 'Yes' : 'No'}
+					</p>
+				</div>
 			</div>
+			))}
+		  </div>
 		</div>
-	);
+	  );
 }
 
 export default Stream;
