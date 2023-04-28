@@ -1,4 +1,7 @@
-import React, { useEffect } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 
 import {
   AnchorProvider,
@@ -47,7 +50,8 @@ interface RawStream {
 	canCancel: boolean;
 	canUpdate: boolean;
 }
-const parseStream = (stream: any, id:string) => {
+
+const parseStream = (stream: any, id: string) => {
 	return {
 		id: id,
 		startTime: stream.startTime.toString(),
@@ -64,7 +68,7 @@ const parseStream = (stream: any, id:string) => {
 		canCancel: stream.canCancel,
 		canUpdate: stream.canUpdate,
 	};
-}
+};
 
 function Stream() {
 	const walletObj = useWallet();
@@ -76,6 +80,8 @@ function Stream() {
 	const programId = new PublicKey("zbcKGdAmXfthXY3rEPBzexVByT2cqRqCZb9NwWdGQ2T");
 	const provider = new AnchorProvider(connection, wallet as any, { preflightCommitment: "recent" });
 	const program = new Program(idl as Idl, programId, provider);
+	const [outgoingSubs, setOutgoingSub] = useState<number[]>([]);
+	const [incommingSub, setIncommingSub] = useState<number[]>([]);
 
 	const streams = async () => {
 		if (publicKey) {
@@ -146,43 +152,71 @@ function Stream() {
 		if (publicKey) {
 			streams();
 		}
-    // eslint-disable-next-line
+		// eslint-disable-next-line
 	}, [publicKey]);
 
-  useEffect(() => {
-    if (outgoing.length) {
-      outgoing.forEach((item, i) => {
-        connection.onAccountChange(new PublicKey(item.id), (info) => {
-          const data = program.coder.accounts.decode("Stream", info.data)
-          console.log(data);
-          const newarr = [...outgoing];
-          console.log("newarr: ", newarr);
-		      // may break
-          newarr[i] = parseStream(data, item.id);
+	useEffect(() => {
+		if (outgoing.length) {
+			outgoing.forEach((item, i) => {
+				const id = connection.onAccountChange(
+					new PublicKey(item.id),
+					(info) => {
+						const data = program.coder.accounts.decode("Stream", info.data);
+						console.log(data);
+						const newarr = [...outgoing];
+						console.log("newarr: ", newarr);
+						// may break
+						newarr[i] = parseStream(data, item.id);
 
-          setOutgoing(newarr);
-        }, "finalized")
-      })
-    }
-    // eslint-disable-next-line
-  }, [outgoing])
+						setOutgoing(newarr);
+					},
+					"finalized",
+				);
+				const newSubscriptions = outgoingSubs;
+				newSubscriptions[i] = id;
+				setOutgoingSub(newSubscriptions);
+			});
+		}
+		return () => {
+			if (outgoingSubs.length) {
+				outgoingSubs.forEach((id) => {
+					connection.removeAccountChangeListener(id);
+				});
+			}
+		};
+	}, [outgoing, setOutgoing, setOutgoingSub, connection, outgoingSubs, program]);
 
-  useEffect(() => {
-    if (incoming.length) {
-      incoming.forEach((item, i) => {
-        connection.onAccountChange(new PublicKey(item.id), (info) => {
-          const data = program.coder.accounts.decode("Stream", info.data)
-          console.log(data);
-          const newarr = [...incoming];
+	useEffect(() => {
+		if (incoming.length) {
+			incoming.forEach((item, i) => {
+				const id = connection.onAccountChange(
+					new PublicKey(item.id),
+					(info) => {
+						const data = program.coder.accounts.decode("Stream", info.data);
+						console.log(data);
+						const newarr = [...incoming];
 
-		  // may break here
-          newarr[i] =  parseStream(data, item.id);
-          setIncoming(newarr);
-        }, "finalized")
-      })
-    }
-    // eslint-disable-next-line
-  }, [outgoing])
+						// may break here
+						newarr[i] = parseStream(data, item.id);
+						setIncoming(newarr);
+					},
+					"finalized",
+				);
+
+				const newSubscriptions = incommingSub;
+				newSubscriptions[i] = id;
+				setIncommingSub(newSubscriptions);
+			});
+		}
+
+		return () => {
+			if (incommingSub.length) {
+				incommingSub.forEach((id) => {
+					connection.removeAccountChangeListener(id);
+				});
+			}
+		};
+	}, [incoming, setIncoming, setIncommingSub, connection, incommingSub, program]);
 
 	return (
 		<div>
