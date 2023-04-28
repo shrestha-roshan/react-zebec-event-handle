@@ -172,7 +172,7 @@ function Stream() {
 					},
 					"finalized",
 				);
-				const newSubscriptions = outgoingSubs;
+				const newSubscriptions = [...outgoingSubs];
 				newSubscriptions[i] = id;
 				setOutgoingSub(newSubscriptions);
 			});
@@ -203,7 +203,7 @@ function Stream() {
 					"finalized",
 				);
 
-				const newSubscriptions = incommingSub;
+				const newSubscriptions = [...incommingSub];
 				newSubscriptions[i] = id;
 				setIncommingSub(newSubscriptions);
 			});
