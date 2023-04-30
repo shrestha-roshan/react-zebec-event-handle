@@ -171,19 +171,20 @@ function Stream() {
 					},
 					"finalized",
 				);
-				// const newSubscriptions = [...outgoingSubs];
-				// newSubscriptions[i] = id;
-				// setOutgoingSub(newSubscriptions);
+				const newSubscriptions = [...outgoingSubs];
+				newSubscriptions[i] = id;
+				setOutgoingSub(newSubscriptions);
 			});
 		}
-		// return () => {
-		// 	if (outgoingSubs.length) {
-		// 		outgoingSubs.forEach((id) => {
-		// 			connection.removeAccountChangeListener(id);
-		// 		});
-		// 	}
-		// };
-	}, [outgoing, setOutgoing, setOutgoingSub, connection, outgoingSubs, program]);
+		return () => {
+			if (outgoingSubs.length) {
+				outgoingSubs.forEach((id) => {
+					console.log("removing listener: ", id);
+					connection.removeAccountChangeListener(id);
+				});
+			}
+		};
+	}, [outgoing]);
 
 	useEffect(() => {
 		if (incoming.length) {
@@ -202,20 +203,20 @@ function Stream() {
 					"finalized",
 				);
 
-				// const newSubscriptions = [...incommingSub];
-				// newSubscriptions[i] = id;
-				// setIncommingSub(newSubscriptions);
+				const newSubscriptions = [...incommingSub];
+				newSubscriptions[i] = id;
+				setIncommingSub(newSubscriptions);
 			});
 		}
 
-		// return () => {
-		// 	if (incommingSub.length) {
-		// 		incommingSub.forEach((id) => {
-		// 			connection.removeAccountChangeListener(id);
-		// 		});
-		// 	}
-		// };
-	}, [incoming, setIncoming, setIncommingSub, connection, incommingSub, program]);
+		return () => {
+			if (incommingSub.length) {
+				incommingSub.forEach((id) => {
+					connection.removeAccountChangeListener(id);
+				});
+			}
+		};
+	}, [incoming]);
 
 	return (
 		<div className="bg-slate-50">
